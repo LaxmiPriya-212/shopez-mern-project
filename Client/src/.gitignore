@@ -1,8 +1,0 @@
-Client/node_modules/
-Server/node_modules/
-
-Client/.env
-Server/.env
-
-dist/
-build/

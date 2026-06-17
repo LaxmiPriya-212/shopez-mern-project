@@ -14,6 +14,9 @@ function Cart() {
   const fetchCart = async () => {
     try {
       const { data } = await getCart(userId);
+
+      console.log("Cart Response:", data);
+
       setCart(data.cart);
     } catch (error) {
       console.log(error);
@@ -33,7 +36,7 @@ function Cart() {
   };
 
   // Loading State
-  if (!cart || !cart.items) {
+  if (!cart) {
     return (
       <div
         style={{
@@ -49,35 +52,75 @@ function Cart() {
     );
   }
 
-  // Calculate Total
+  // Total Amount
   const totalAmount =
-    cart.items.reduce(
+    cart.items?.reduce(
       (total, item) =>
-        total + item.product.price * item.quantity,
+        total +
+        ((item.product?.price || 0) * item.quantity),
       0
     ) || 0;
 
-  const handlePlaceOrder = async () => {
-    try {
-      const orderData = {
-        user: cart.user._id,
+  // Place Order
+  const handlePlaceOrder = async (
+  paymentMethod = "Cash On Delivery"
+) => {
+  try {
+    const orderData = {
+      user: cart.user._id,
 
-        products: cart.items.map((item) => ({
+      products: cart.items
+        .filter((item) => item.product)
+        .map((item) => ({
           product: item.product._id,
           quantity: item.quantity,
         })),
 
-        totalAmount,
-      };
+      totalAmount,
+      paymentMethod,
+    };
 
-      await createOrder(orderData);
+    await createOrder(orderData);
 
-      alert("📦 Order Placed Successfully!");
-    } catch (error) {
-      console.log(error);
-      alert("Order Failed");
-    }
-  };
+    alert(
+      `📦 Order Placed Successfully!\nPayment Method: ${paymentMethod}`
+    );
+
+    fetchCart();
+  } catch (error) {
+    console.log(error);
+    alert("Order Failed");
+  }
+};
+
+  const handleCheckout = () => {
+  const paymentMethod = window.prompt(
+    `Total Amount: ₹${totalAmount}
+
+Choose Payment Method:
+
+1 - Online Payment
+2 - Cash On Delivery (COD)
+
+Enter 1 or 2`
+  );
+
+  if (paymentMethod === "1") {
+    alert(
+      `✅ Online Payment Successful!\nAmount Paid: ₹${totalAmount}`
+    );
+
+    handlePlaceOrder("Online Payment");
+  } else if (paymentMethod === "2") {
+    alert(
+      `📦 Cash On Delivery Selected.\nPlease pay ₹${totalAmount} upon delivery.`
+    );
+
+    handlePlaceOrder("Cash On Delivery");
+  } else {
+    alert("❌ Invalid Payment Option");
+  }
+};
 
   return (
     <div
@@ -108,7 +151,8 @@ function Cart() {
           🛒 My Cart
         </h1>
 
-        {cart.items.length === 0 ? (
+        {cart.items?.filter((item) => item.product)
+          .length === 0 ? (
           <h2
             style={{
               textAlign: "center",
@@ -118,45 +162,49 @@ function Cart() {
           </h2>
         ) : (
           <>
-            {cart.items.map((item) => (
-              <div
-                key={item._id}
-                style={{
-                  border: "1px solid #ddd",
-                  borderRadius: "12px",
-                  padding: "20px",
-                  marginBottom: "15px",
-                }}
-              >
-                <h2>{item.product.name}</h2>
-
-                <p>
-                  Quantity: {item.quantity}
-                </p>
-
-                <h3
+            {cart.items
+              .filter((item) => item.product)
+              .map((item) => (
+                <div
+                  key={item._id}
                   style={{
-                    color: "#2563eb",
+                    border: "1px solid #ddd",
+                    borderRadius: "12px",
+                    padding: "20px",
+                    marginBottom: "15px",
                   }}
                 >
-                  ₹{item.product.price}
-                </h3>
+                  <h2>{item.product.name}</h2>
 
-                <button
-                  onClick={() => handleRemove(cart._id)}
-                  style={{
-                    background: "#ef4444",
-                    color: "white",
-                    border: "none",
-                    padding: "10px 15px",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Remove ❌
-                </button>
-              </div>
-            ))}
+                  <p>
+                    Quantity: {item.quantity}
+                  </p>
+
+                  <h3
+                    style={{
+                      color: "#2563eb",
+                    }}
+                  >
+                    ₹{item.product.price}
+                  </h3>
+
+                  <button
+                    onClick={() =>
+                      handleRemove(cart._id)
+                    }
+                    style={{
+                      background: "#ef4444",
+                      color: "white",
+                      border: "none",
+                      padding: "10px 15px",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Remove ❌
+                  </button>
+                </div>
+              ))}
 
             <div
               style={{
@@ -168,6 +216,7 @@ function Cart() {
               <h2>Total: ₹{totalAmount}</h2>
 
               <button
+                onClick={handleCheckout}
                 style={{
                   width: "100%",
                   padding: "14px",

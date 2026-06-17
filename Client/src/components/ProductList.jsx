@@ -71,36 +71,47 @@ function ProductList() {
       />
 
       {/* Category Filters */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "15px",
-          marginBottom: "30px",
-          flexWrap: "wrap",
-        }}
-      >
-        {["All", "Mobiles", "Laptops", "Accessories"].map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setCategory(cat)}
-            style={{
-              padding: "10px 20px",
-              border: "none",
-              borderRadius: "25px",
-              cursor: "pointer",
-              fontWeight: "bold",
-              background:
-                category === cat ? "#2563eb" : "#e5e7eb",
-              color:
-                category === cat ? "white" : "black",
-            }}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
+<div
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    gap: "15px",
+    marginBottom: "30px",
+    flexWrap: "wrap",
+  }}
+>
+  {[
+    "All",
+    "Mobiles",
+    "Laptops",
+    "Accessories",
+    "Tablets",
+    "Wearables",
+    "TVs",
+  ].map((cat) => (
+    <button
+      key={cat}
+      onClick={() => setCategory(cat)}
+      style={{
+        padding: "10px 20px",
+        border: "none",
+        borderRadius: "25px",
+        cursor: "pointer",
+        fontWeight: "bold",
+        background:
+          category === cat
+            ? "#2563eb"
+            : "#e5e7eb",
+        color:
+          category === cat
+            ? "white"
+            : "black",
+      }}
+    >
+      {cat}
+    </button>
+  ))}
+</div>
       {/* Product Grid */}
       <div
         style={{
@@ -131,18 +142,31 @@ function ProductList() {
                 boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
               }}
             >
-              <img
-                src="https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800"
-                alt={product.name}
-                style={{
-                  width: "100%",
-                  height: "220px",
-                  objectFit: "cover",
-                  borderRadius: "10px",
-                  marginBottom: "15px",
-                }}
-              />
-
+  <img
+  src={
+    product.category === "Mobiles"
+      ? "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800"
+      : product.category === "Laptops"
+      ? "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800"
+      : product.category === "Accessories"
+      ? "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800"
+      : product.category === "Tablets"
+      ? "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800"
+      : product.category === "Wearables"
+      ? "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800"
+      : product.category === "TVs"
+      ? "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=800"
+      : "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800"
+  }
+  alt={product.name}
+  style={{
+    width: "100%",
+    height: "220px",
+    objectFit: "cover",
+    borderRadius: "10px",
+    marginBottom: "15px",
+  }}
+/>
               <h2>{product.name}</h2>
 
               <p style={{ color: "#666" }}>

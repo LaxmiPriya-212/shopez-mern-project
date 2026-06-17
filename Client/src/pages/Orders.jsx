@@ -35,35 +35,85 @@ function Orders() {
         📦 My Orders
       </h1>
 
-      {orders.map((order) => (
-        <div
-          key={order._id}
-          style={{
-            background: "white",
-            padding: "20px",
-            borderRadius: "15px",
-            marginBottom: "20px",
-            boxShadow:
-              "0 10px 25px rgba(0,0,0,0.08)",
-          }}
-        >
-          <h3>
-            Order ID: {order._id}
-          </h3>
+      {orders.length === 0 ? (
+        <h2 style={{ textAlign: "center" }}>
+          No Orders Found 📭
+        </h2>
+      ) : (
+        orders.map((order) => (
+          <div
+            key={order._id}
+            style={{
+              background: "white",
+              padding: "25px",
+              borderRadius: "15px",
+              marginBottom: "20px",
+              boxShadow:
+                "0 10px 25px rgba(0,0,0,0.08)",
+            }}
+          >
+            <h3>
+              🆔 Order ID: {order._id}
+            </h3>
 
-          <p>
-            Customer: {order.user.name}
-          </p>
+            <p>
+              👤 Customer: {order.user?.name}
+            </p>
 
-          <p>
-            Status: {order.status}
-          </p>
+            <p>
+              💳 Payment Method:{" "}
+              {order.paymentMethod ||
+                "Cash On Delivery"}
+            </p>
 
-          <h3>
-            Total: ₹{order.totalAmount}
-          </h3>
-        </div>
-      ))}
+            <p>
+              🚚 Status: {order.status}
+            </p>
+
+            <p>
+              📅 Ordered On:{" "}
+              {new Date(
+                order.createdAt
+              ).toLocaleDateString()}
+            </p>
+
+            <hr />
+
+            <h3>🛍 Products</h3>
+
+            {order.products.map((item) => (
+              <div
+                key={item._id}
+                style={{
+                  padding: "10px 0",
+                }}
+              >
+                <p>
+                  Product:{" "}
+                  {item.product
+                    ? item.product.name
+                    : "Deleted Product"}
+                </p>
+
+                <p>
+                  Quantity: {item.quantity}
+                </p>
+              </div>
+            ))}
+
+            <hr />
+
+            <h2
+              style={{
+                color: "#2563eb",
+              }}
+            >
+              💰 Total Amount: ₹
+              {order.totalAmount}
+            </h2>
+          </div>
+        ))
+      )}
     </div>
   );
 }

@@ -3,12 +3,18 @@ const Order = require("../models/Order");
 // Create Order
 const createOrder = async (req, res) => {
   try {
-    const { user, products, totalAmount } = req.body;
+    const {
+      user,
+      products,
+      totalAmount,
+      paymentMethod,
+    } = req.body;
 
     const order = await Order.create({
       user,
       products,
       totalAmount,
+      paymentMethod,
     });
 
     res.status(201).json({
@@ -23,6 +29,8 @@ const createOrder = async (req, res) => {
     });
   }
 };
+
+// Get All Orders
 const getOrders = async (req, res) => {
   try {
     const orders = await Order.find()
@@ -41,6 +49,8 @@ const getOrders = async (req, res) => {
     });
   }
 };
+
+// Update Order Status
 const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -70,8 +80,9 @@ const updateOrderStatus = async (req, res) => {
     });
   }
 };
+
 module.exports = {
   createOrder,
-   getOrders,
-    updateOrderStatus,
+  getOrders,
+  updateOrderStatus,
 };
