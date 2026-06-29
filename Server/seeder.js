@@ -194,6 +194,302 @@ const products = [
     reviews: [
       { name: "Karan Johar", rating: 4.6, comment: "Sound quality is decent, picture quality is mind-blowing for this price.", user: null }
     ]
+  },
+  {
+    name: "Google Pixel 8 Pro",
+    description: "The all-pro phone engineered by Google. It has the best of Google AI, the most advanced Pixel Camera ever, and can even edit audio in videos with Audio Magic Eraser.",
+    price: 109900,
+    category: "Mobiles",
+    brand: "Google",
+    image: "https://images.unsplash.com/photo-1698342468307-e07e8ef6e61f?w=800",
+    stock: 15,
+    rating: 4.6,
+    numReviews: 1,
+    isFeatured: false,
+    specifications: [
+      { name: "Display", value: "6.7-inch Super Actua display, 120Hz" },
+      { name: "Processor", value: "Google Tensor G3" },
+      { name: "Camera", value: "50MP Main + 48MP Wide + 48MP Zoom" },
+      { name: "Battery", value: "5050 mAh with 30W Fast Charging" }
+    ],
+    reviews: [
+      { name: "Sahil Varma", rating: 4.6, comment: "The AI photo features are pure magic. Best clean Android experience.", user: null }
+    ]
+  },
+  {
+    name: "OnePlus 12 5G",
+    description: "Redefined flagship performance featuring Snapdragon 8 Gen 3, a 4th Gen Hasselblad Camera System, and blazing fast 100W SUPERVOOC charging.",
+    price: 64999,
+    category: "Mobiles",
+    brand: "OnePlus",
+    image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800",
+    stock: 18,
+    rating: 4.7,
+    numReviews: 1,
+    isFeatured: false,
+    specifications: [
+      { name: "Display", value: "6.82-inch 2K ProXDR 120Hz AMOLED" },
+      { name: "Charging", value: "100W Wired / 50W Wireless Charging" },
+      { name: "RAM", value: "16 GB LPDDR5X" },
+      { name: "Storage", value: "512 GB UFS 4.0" }
+    ],
+    reviews: [
+      { name: "Kabir Roy", rating: 4.7, comment: "Loads in 25 minutes! Extremely smooth, zero lags in gaming.", user: null }
+    ]
+  },
+  {
+    name: "Dell XPS 15 Laptop",
+    description: "Power your passions. The XPS 15 is the perfect balance of size and performance, combining a stunning OLED display and high-end graphics processor.",
+    price: 210000,
+    category: "Laptops",
+    brand: "Dell",
+    image: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=800",
+    stock: 6,
+    rating: 4.5,
+    numReviews: 1,
+    isFeatured: false,
+    specifications: [
+      { name: "Processor", value: "Intel Core i7 13th Gen" },
+      { name: "Display", value: "15.6-inch 3.5K OLED Touchscreen" },
+      { name: "Graphics", value: "NVIDIA GeForce RTX 4060 8GB" },
+      { name: "RAM", value: "32 GB DDR5" }
+    ],
+    reviews: [
+      { name: "Arjun Singhal", rating: 4.5, comment: "Superb build quality and trackpad. Best premium Windows laptop.", user: null }
+    ]
+  },
+  {
+    name: "ASUS ROG Zephyrus G14",
+    description: "Compact size, colossal power. A 14-inch gaming beast featuring a gorgeous Nebula HDR display and premium performance hardware.",
+    price: 145000,
+    category: "Laptops",
+    brand: "ASUS",
+    image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800",
+    stock: 9,
+    rating: 4.8,
+    numReviews: 1,
+    isFeatured: true,
+    specifications: [
+      { name: "Processor", value: "AMD Ryzen 9 8945HS" },
+      { name: "Graphics", value: "NVIDIA GeForce RTX 4070 8GB" },
+      { name: "Display", value: "14-inch 120Hz ROG Nebula OLED" },
+      { name: "Weight", value: "1.5 kg Ultraportable" }
+    ],
+    reviews: [
+      { name: "Rishabh Joshi", rating: 4.8, comment: "Unbelievable power in a compact 14-inch chassis. Stays relatively cool.", user: null }
+    ]
+  },
+  {
+    name: "HP Spectre x360 2-in-1",
+    description: "Crafted to perfection. A versatile touchscreen convertible that easily switches between laptop, tent, and tablet modes, powered by Intel Core Ultra.",
+    price: 165000,
+    category: "Laptops",
+    brand: "HP",
+    image: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800",
+    stock: 7,
+    rating: 4.6,
+    numReviews: 1,
+    isFeatured: false,
+    specifications: [
+      { name: "Processor", value: "Intel Core Ultra 7 with Intel AI Boost" },
+      { name: "Display", value: "14-inch 2.8K OLED Touchscreen" },
+      { name: "Included", value: "HP Rechargeable MPP 2.0 Tilt Pen" },
+      { name: "Battery", value: "Up to 15 hours battery life" }
+    ],
+    reviews: [
+      { name: "Meera Gupta", rating: 4.6, comment: "Beautiful gem-cut design, the pen responsiveness is smooth.", user: null }
+    ]
+  },
+  {
+    name: "Sony WF-1000XM5 Earbuds",
+    description: "The best noise-cancelling earbuds with high-res audio, clear call quality, and a comfortable, ergonomic design.",
+    price: 24990,
+    category: "Accessories",
+    brand: "Sony",
+    image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800",
+    stock: 30,
+    rating: 4.5,
+    numReviews: 1,
+    isFeatured: false,
+    specifications: [
+      { name: "Driver", value: "Dynamic Driver X (8.4mm)" },
+      { name: "ANC", value: "Integrated Processor V2 + QN2e Chip" },
+      { name: "Battery", value: "Up to 8 hours (24 hours total with case)" },
+      { name: "Bluetooth", value: "LE Audio and Multipoint Connection" }
+    ],
+    reviews: [
+      { name: "Nikhil Rao", rating: 4.5, comment: "Much smaller and lighter than XM4, bass is deep and clear.", user: null }
+    ]
+  },
+  {
+    name: "Logitech MX Master 3S Mouse",
+    description: "An iconic mouse remastered. Feel every moment of your workflow with even more precision, tactile clicks, and 8K DPI tracking.",
+    price: 10995,
+    category: "Accessories",
+    brand: "Logitech",
+    image: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=800",
+    stock: 45,
+    rating: 4.8,
+    numReviews: 2,
+    isFeatured: true,
+    specifications: [
+      { name: "Sensor", value: "Darkfield high-precision 8000 DPI" },
+      { name: "Clicks", value: "Quiet clicks (90% noise reduction)" },
+      { name: "Scroll Wheel", value: "MagSpeed Electromagnetic scroll" },
+      { name: "Compatibility", value: "Windows, macOS, Linux, iPadOS" }
+    ],
+    reviews: [
+      { name: "Divya Nair", rating: 5, comment: "Saved my wrist! The ergonomic grip and thumb wheel are incredibly useful.", user: null },
+      { name: "Gautam Das", rating: 4.6, comment: "Seamless shifting between my Mac and PC. High quality.", user: null }
+    ]
+  },
+  {
+    name: "Keychron K2 Mechanical Keyboard",
+    description: "A compact 75% layout wireless mechanical keyboard designed for maximum productivity and premium tactile feedback.",
+    price: 9999,
+    category: "Accessories",
+    brand: "Keychron",
+    image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800",
+    stock: 22,
+    rating: 4.7,
+    numReviews: 1,
+    isFeatured: false,
+    specifications: [
+      { name: "Layout", value: "75% Compact (84 keys)" },
+      { name: "Switches", value: "Gateron G Pro Mechanical Brown Switches" },
+      { name: "Backlight", value: "RGB backlight with 18 effects" },
+      { name: "Battery", value: "4000 mAh rechargeable battery" }
+    ],
+    reviews: [
+      { name: "Vikrant Singh", rating: 4.7, comment: "Awesome sound and tactile feel. Works perfectly with macOS.", user: null }
+    ]
+  },
+  {
+    name: "Samsung Galaxy Tab S9 Ultra",
+    description: "Our largest Dynamic AMOLED 2X tablet. IP68 water and dust resistant, paired with the powerful Snapdragon 8 Gen 2 processor.",
+    price: 108900,
+    category: "Tablets",
+    brand: "Samsung",
+    image: "https://images.unsplash.com/photo-1561154464-82e9adf32764?w=800",
+    stock: 8,
+    rating: 4.7,
+    numReviews: 1,
+    isFeatured: false,
+    specifications: [
+      { name: "Display", value: "14.6-inch Dynamic AMOLED 2X, 120Hz" },
+      { name: "Waterproof", value: "IP68 rated tablet and S-Pen" },
+      { name: "RAM", value: "12 GB RAM" },
+      { name: "Storage", value: "256 GB with microSD slot" }
+    ],
+    reviews: [
+      { name: "Sneha Menon", rating: 4.7, comment: "This screen is massive! Writing with the included S-Pen feels very natural.", user: null }
+    ]
+  },
+  {
+    name: "Microsoft Surface Pro 9",
+    description: "The power of a laptop, the flexibility of a tablet. Featuring a built-in kickstand, 12th Gen Intel Core processors, and vibrant PixelSense display.",
+    price: 115000,
+    category: "Tablets",
+    brand: "Microsoft",
+    image: "https://images.unsplash.com/photo-1605379399642-870262d3d051?w=800",
+    stock: 11,
+    rating: 4.4,
+    numReviews: 1,
+    isFeatured: false,
+    specifications: [
+      { name: "Processor", value: "Intel Core i5 12th Gen" },
+      { name: "Display", value: "13-inch PixelSense touchscreen, 120Hz" },
+      { name: "OS", value: "Windows 11 Home" },
+      { name: "Ports", value: "2 x USB-C with Thunderbolt 4" }
+    ],
+    reviews: [
+      { name: "Prakash Jha", rating: 4.4, comment: "The kickstand is excellent, but you have to buy the keyboard separately.", user: null }
+    ]
+  },
+  {
+    name: "Samsung Galaxy Watch 6",
+    description: "Start your wellness journey with customizable sleep tracking, body composition analytics, and a 20% larger display with thinner bezel.",
+    price: 30999,
+    category: "Wearables",
+    brand: "Samsung",
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800",
+    stock: 17,
+    rating: 4.5,
+    numReviews: 1,
+    isFeatured: false,
+    specifications: [
+      { name: "Display Size", value: "44mm Super AMOLED" },
+      { name: "OS", value: "Wear OS Powered by Samsung" },
+      { name: "Sensors", value: "BioActive sensor (ECG, Heart Rate, BIA)" },
+      { name: "Battery", value: "Up to 40 hours with fast charge" }
+    ],
+    reviews: [
+      { name: "Suresh Pillai", rating: 4.5, comment: "Sleep reports are highly comprehensive. Beautiful display panel.", user: null }
+    ]
+  },
+  {
+    name: "Garmin Fenix 7 Sapphire Solar",
+    description: "Premium multisport GPS smartwatch. Power glass solar charging lens extends battery life to power you through tough training challenges.",
+    price: 75990,
+    category: "Wearables",
+    brand: "Garmin",
+    image: "https://images.unsplash.com/photo-1434494878577-86c23bcb06b9?w=800",
+    stock: 6,
+    rating: 4.9,
+    numReviews: 1,
+    isFeatured: true,
+    specifications: [
+      { name: "Lens material", value: "Power Sapphire solar charging glass" },
+      { name: "Battery", value: "Up to 22 days in smartwatch mode" },
+      { name: "Sensors", value: "Multi-band GNSS, altimeter, barometer, compass" },
+      { name: "Durability", value: "U.S. military standard 810G thermal/shock" }
+    ],
+    reviews: [
+      { name: "Devendra Negi", rating: 4.9, comment: "Unbeatable battery life. Best watch in the world for hiking and running.", user: null }
+    ]
+  },
+  {
+    name: "LG C3 65-inch 4K OLED TV",
+    description: "Enjoy brilliant visuals with perfect black levels, infinite contrast, and over 8 million self-lit pixels, powered by AI α9 Gen 6 processor.",
+    price: 189900,
+    category: "TVs",
+    brand: "LG",
+    image: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=800",
+    stock: 4,
+    rating: 4.9,
+    numReviews: 2,
+    isFeatured: true,
+    specifications: [
+      { name: "Display Panel", value: "OLED evo with Brightness Booster" },
+      { name: "Refresh Rate", value: "120Hz native VRR & G-Sync" },
+      { name: "HDMI Ports", value: "4 x HDMI 2.1 ports" },
+      { name: "Audio", value: "9.1.2 Virtual Surround Sound" }
+    ],
+    reviews: [
+      { name: "Rajesh Khanna", rating: 5, comment: "Best TV for gaming on PS5. Dark scenes look absolutely incredible.", user: null },
+      { name: "Shalini Iyer", rating: 4.8, comment: "WebOS is very fast and smooth, picture colors are very natural.", user: null }
+    ]
+  },
+  {
+    name: "Samsung Neo QLED 65-inch TV",
+    description: "Quantum Matrix Technology with Mini LEDs delivers stunning detail in both the darkest and brightest scenes.",
+    price: 169900,
+    category: "TVs",
+    brand: "Samsung",
+    image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800",
+    stock: 5,
+    rating: 4.7,
+    numReviews: 1,
+    isFeatured: false,
+    specifications: [
+      { name: "Backlight", value: "Quantum Mini LED display" },
+      { name: "Processor", value: "Neural Quantum Processor 4K" },
+      { name: "Audio", value: "Object Tracking Sound (OTS) +" },
+      { name: "Smart OS", value: "Tizen Smart TV" }
+    ],
+    reviews: [
+      { name: "Varun Malhotra", rating: 4.7, comment: "Extremely bright display panel, perfect for my brightly lit living room.", user: null }
+    ]
   }
 ];
 
