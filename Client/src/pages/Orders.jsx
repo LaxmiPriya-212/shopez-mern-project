@@ -1,8 +1,12 @@
-import { useEffect, useState } from "react";
-import { getOrders } from "../api/orderApi";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { getMyOrders } from "../api/orderApi";
+import { useToast } from "../context/ToastContext";
 
 function Orders() {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { showToast } = useToast();
 
   useEffect(() => {
     fetchOrders();
@@ -10,110 +14,161 @@ function Orders() {
 
   const fetchOrders = async () => {
     try {
-      const { data } = await getOrders();
-      setOrders(data.orders);
+      setLoading(true);
+      const { data } = await getMyOrders();
+      if (data.success) {
+        setOrders(data.orders);
+      }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      showToast("Failed to fetch your orders", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
-    <div
-      style={{
-        minHeight: "85vh",
-        padding: "40px",
-        background:
-          "linear-gradient(135deg,#f8fafc,#e2e8f0)",
-      }}
-    >
-      <h1
-        style={{
-          textAlign: "center",
-          marginBottom: "30px",
-        }}
-      >
-        📦 My Orders
-      </h1>
+  if (loading) {
+    return (
+      <div style={{ minHeight: "75vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <div className="skeleton" style={{ width: "80px", height: "80px", borderRadius: "50%" }} />
+      </div>
+    );
+  }
 
-      {orders.length === 0 ? (
-        <h2 style={{ textAlign: "center" }}>
-          No Orders Found 📭
-        </h2>
-      ) : (
-        orders.map((order) => (
+  return (
+    <div className="section-padding anim-fade-in" style={{ minHeight: "85vh", textAlign: "left" }}>
+      <div className="container" style={{ maxWidth: "850px" }}>
+        <h1 style={{ marginBottom: "32px", fontSize: "2.25rem" }}>📦 My Orders</h1>
+
+        {orders.length === 0 ? (
           <div
-            key={order._id}
+            className="glass-card"
             style={{
-              background: "white",
-              padding: "25px",
-              borderRadius: "15px",
-              marginBottom: "20px",
-              boxShadow:
-                "0 10px 25px rgba(0,0,0,0.08)",
+              padding: "60px 40px",
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "20px",
             }}
           >
-            <h3>
-              🆔 Order ID: {order._id}
-            </h3>
-
-            <p>
-              👤 Customer: {order.user?.name}
+            <span style={{ fontSize: "4rem" }}>📦</span>
+            <h2>No Orders Found</h2>
+            <p style={{ color: "var(--text-muted)", maxWidth: "400px" }}>
+              You haven't placed any orders yet. Explore our premium store collections and place your first order.
             </p>
-
-            <p>
-              💳 Payment Method:{" "}
-              {order.paymentMethod ||
-                "Cash On Delivery"}
-            </p>
-
-            <p>
-              🚚 Status: {order.status}
-            </p>
-
-            <p>
-              📅 Ordered On:{" "}
-              {new Date(
-                order.createdAt
-              ).toLocaleDateString()}
-            </p>
-
-            <hr />
-
-            <h3>🛍 Products</h3>
-
-            {order.products.map((item) => (
-              <div
-                key={item._id}
-                style={{
-                  padding: "10px 0",
-                }}
-              >
-                <p>
-                  Product:{" "}
-                  {item.product
-                    ? item.product.name
-                    : "Deleted Product"}
-                </p>
-
-                <p>
-                  Quantity: {item.quantity}
-                </p>
-              </div>
-            ))}
-
-            <hr />
-
-            <h2
-              style={{
-                color: "#2563eb",
-              }}
-            >
-              💰 Total Amount: ₹
-              {order.totalAmount}
-            </h2>
+            <Link to="/products" className="btn btn-primary">
+              Start Shopping
+            </Link>
           </div>
-        ))
-      )}
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            {orders.map((order) => {
+              // Status Badge styling helper
+              let statusBadge = "badge-warning";
+              if (order.status === "Delivered") statusBadge = "badge-success";
+              else if (order.status === "Shipped") statusBadge = "badge-primary";
+              else if (order.status === "Cancelled") statusBadge = "badge-danger";
+
+              const orderDate = new Date(order.createdAt).toLocaleDateString("en-IN", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              });
+
+              return (
+                <div
+                  key={order._id}
+                  className="glass-card"
+                  style={{
+                    padding: "24px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "16px",
+                  }}
+                >
+                  {/* Order Top Panel */}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      gap: "12px",
+                      borderBottom: "1px solid var(--border-color)",
+                      paddingBottom: "16px",
+                    }}
+                  >
+                    <div>
+                      <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Ordered on {orderDate}</span>
+                      <h3 style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "4px" }}>
+                        Order ID: <span style={{ color: "var(--primary)" }}>#{order._id}</span>
+                      </h3>
+                    </div>
+                    
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                      <span className={`badge ${statusBadge}`}>{order.status}</span>
+                      <Link to={`/order/${order._id}`} className="btn btn-secondary btn-sm">
+                        View Details
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Order Products List */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                    {order.products.map((item) => (
+                      <div
+                        key={item._id}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          fontSize: "0.95rem",
+                        }}
+                      >
+                        <span style={{ fontWeight: "500" }}>
+                          {item.product ? item.product.name : "Deleted Product"}{" "}
+                          <strong style={{ color: "var(--text-muted)" }}>× {item.quantity}</strong>
+                        </span>
+                        <span style={{ fontWeight: "700" }}>
+                          ₹{((item.product?.price || 0) * item.quantity).toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <hr style={{ border: "none", borderTop: "1px solid var(--border-color)" }} />
+
+                  {/* Order Total Panel */}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <div style={{ display: "flex", gap: "16px", fontSize: "0.85rem" }}>
+                      <span>
+                        Payment:{" "}
+                        <strong style={{ color: order.isPaid ? "var(--success)" : "var(--danger)" }}>
+                          {order.isPaid ? "Paid" : "Unpaid"}
+                        </strong>
+                      </span>
+                      <span>
+                        Method: <strong>{order.paymentMethod}</strong>
+                      </span>
+                    </div>
+                    
+                    <h3 style={{ fontSize: "1.25rem", fontWeight: "800", color: "var(--primary)" }}>
+                      Total: ₹{order.totalAmount.toLocaleString("en-IN")}
+                    </h3>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
