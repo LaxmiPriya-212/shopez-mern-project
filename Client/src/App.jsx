@@ -1,173 +1,117 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import React from "react";
 
+// Contexts
+import { ToastProvider } from "./context/ToastContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
+import { WishlistProvider } from "./context/WishlistContext";
+
+// Components
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+
+// Pages
 import Home from "./pages/Home";
+import Products from "./pages/Products";
+import ProductDetails from "./pages/ProductDetails";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import OrderDetails from "./pages/OrderDetails";
 import Orders from "./pages/Orders";
-import Admin from "./pages/Admin";
-import AdminProducts from "./pages/AdminProducts";
-import AdminAddProduct from "./pages/AdminAddProduct";
-import AdminOrders from "./pages/AdminOrders";
-import AdminStats from "./pages/AdminStats";
+import Wishlist from "./pages/Wishlist";
+import Profile from "./pages/Profile";
+import AdminDashboard from "./pages/AdminDashboard";
 
-function App() {
-  const token = localStorage.getItem("token");
+// Route Protection Wrappers
+const ProtectedRoute = ({ children }) => {
+  const { token, loading } = useAuth();
+  const location = useLocation();
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+  if (loading) {
+    return (
+      <div style={{ minHeight: "80vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <div className="skeleton" style={{ width: "60px", height: "60px", borderRadius: "50%" }} />
+      </div>
+    );
+  }
 
-    alert("Logged Out Successfully 👋");
+  return token ? (
+    children
+  ) : (
+    <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />
+  );
+};
 
-    window.location.reload();
-  };
+const AdminRoute = ({ children }) => {
+  const { token, loading, isAdmin } = useAuth();
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: "80vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <div className="skeleton" style={{ width: "60px", height: "60px", borderRadius: "50%" }} />
+      </div>
+    );
+  }
+
+  return token && isAdmin ? children : <Navigate to="/" replace />;
+};
+
+function AppContent() {
+  const { isAdmin } = useAuth();
+  const location = useLocation();
+  const isInsideAdmin = location.pathname.startsWith("/admin");
 
   return (
-    <BrowserRouter>
-      {/* Navbar */}
-      <nav
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "20px 40px",
-          background: "linear-gradient(90deg,#0f172a,#1e293b)",
-          color: "white",
-        }}
-      >
-        <h2
-          style={{
-            margin: 0,
-            fontSize: "32px",
-          }}
-        >
-          🛒 ShopEZ
-        </h2>
+    <>
+      {/* Conditionally hide Navbar/Footer when inside the Admin Panel for a cleaner dashboard feel */}
+      {!isInsideAdmin && <Navbar />}
+      
+      <main style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-        <div
-          style={{
-            display: "flex",
-            gap: "25px",
-            fontSize: "18px",
-            alignItems: "center",
-          }}
-        >
-          <Link
-            to="/"
-            style={{
-              color: "white",
-              textDecoration: "none",
-            }}
-          >
-            Home
-          </Link>
+          {/* Protected Customer Routes */}
+          <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+          <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+          <Route path="/order/:id" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+          <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
-          <Link
-            to="/"
-            style={{
-              color: "white",
-              textDecoration: "none",
-            }}
-          >
-            Products
-          </Link>
+          {/* Admin Protected Routes */}
+          <Route path="/admin/*" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
 
-          <Link
-            to="/cart"
-            style={{
-              color: "white",
-              textDecoration: "none",
-            }}
-          >
-            Cart
-          </Link>
+      {!isInsideAdmin && <Footer />}
+    </>
+  );
+}
 
-          <Link
-            to="/orders"
-            style={{
-              color: "white",
-              textDecoration: "none",
-            }}
-          >
-            Orders
-          </Link>
-                 <Link
-  to="/admin"
-  style={{
-    color: "white",
-    textDecoration: "none",
-  }}
->
-  Admin
-</Link>
-          {token ? (
-            <button
-              onClick={handleLogout}
-              style={{
-                background: "#ef4444",
-                color: "white",
-                border: "none",
-                padding: "10px 16px",
-                borderRadius: "8px",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-            >
-              Logout 🚪
-            </button>
-          ) : (
-            <>
-              <Link
-                to="/login"
-                style={{
-                  color: "white",
-                  textDecoration: "none",
-                }}
-              >
-                Login
-              </Link>
-
-              <Link
-                to="/register"
-                style={{
-                  color: "white",
-                  textDecoration: "none",
-                }}
-              >
-                Register
-              </Link>
-        
-            </>
-          )}
-        </div>
-      </nav>
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/orders" element={<Orders />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route
-               path="/admin/products"
-               element={<AdminProducts />}
-/>
-        <Route
-               path="/admin/add-product"
-               element={<AdminAddProduct />}
-/>
-        <Route
-               path="/admin/orders"
-               element={<AdminOrders />}
-/>
-        <Route
-               path="/admin/stats"
-               element={<AdminStats />}
-/>
-      </Routes>
-    </BrowserRouter>
+function App() {
+  return (
+    <ToastProvider>
+      <AuthProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <BrowserRouter>
+              <AppContent />
+            </BrowserRouter>
+          </WishlistProvider>
+        </CartProvider>
+      </AuthProvider>
+    </ToastProvider>
   );
 }
 
