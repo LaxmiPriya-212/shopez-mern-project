@@ -1,0 +1,33 @@
+services:
+  # 1. Express Backend Service
+  - type: web
+    name: shopez-backend
+    env: node
+    plan: free
+    rootDir: Server
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: MONGO_URI
+        sync: false
+        placeholder: "Your MongoDB Atlas connection URI"
+      - key: JWT_SECRET
+        generateValue: true
+
+  # 2. React Vite Frontend Service
+  - type: web
+    name: shopez-frontend
+    env: static
+    plan: free
+    rootDir: Client
+    buildCommand: npm install && npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: shopez-backend
+          type: web
+          property: url
+        value: "" # Will be replaced dynamically by the property above, but we append /api in the code if needed
