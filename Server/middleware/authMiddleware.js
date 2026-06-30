@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 const protect = async (req, res, next) => {
   try {
@@ -18,10 +19,18 @@ const protect = async (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, "shopez_secret_key");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "shopez_secret_key");
 
-    req.user = decoded;
+    // Fetch user and attach to request (excluding password)
+    const user = await User.findById(decoded.id).select("-password");
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found, authorization failed",
+      });
+    }
 
+    req.user = user;
     next();
   } catch (error) {
     res.status(401).json({
@@ -31,4 +40,15 @@ const protect = async (req, res, next) => {
   }
 };
 
-module.exports = protect;
+const admin = (req, res, next) => {
+  if (req.user && req.user.role === "admin") {
+    next();
+  } else {
+    res.status(403).json({
+      success: false,
+      message: "Not authorized as an admin",
+    });
+  }
+};
+
+module.exports = { protect, admin };

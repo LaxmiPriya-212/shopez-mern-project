@@ -1,258 +1,409 @@
-import { useEffect, useState } from "react";
-import { getCart, removeCartItem } from "../api/cartApi";
-import { createOrder } from "../api/orderApi";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
+import { useToast } from "../context/ToastContext";
 
 function Cart() {
-  const [cart, setCart] = useState(null);
+  const { cart, loading, updateProductQty, removeProductFromCart, cartTotal } = useCart();
+  const { wishlist, toggleWishlist } = useWishlist();
+  const { showToast } = useToast();
+  const navigate = useNavigate();
 
-  const userId = "6a31732db963cb5a5a2e170f";
+  // Coupon State
+  const [couponCode, setCouponCode] = useState("");
+  const [discount, setDiscount] = useState(0); // in percentage
 
-  useEffect(() => {
-    fetchCart();
-  }, []);
-
-  const fetchCart = async () => {
-    try {
-      const { data } = await getCart(userId);
-
-      console.log("Cart Response:", data);
-
-      setCart(data.cart);
-    } catch (error) {
-      console.log(error);
+  const handleApplyCoupon = (e) => {
+    e.preventDefault();
+    if (couponCode.trim().toUpperCase() === "TECH10") {
+      setDiscount(10);
+      showToast("Coupon applied! 10% discount added. 🏷️", "success");
+    } else {
+      showToast("Invalid coupon code", "error");
+      setDiscount(0);
     }
   };
 
-  const handleRemove = async (cartId) => {
-    try {
-      await removeCartItem(cartId);
+  // Financial Breakdown
+  const subtotal = cartTotal;
+  const discountAmount = Math.round(subtotal * (discount / 100));
+  const shippingCost = subtotal > 2000 || subtotal === 0 ? 0 : 99;
+  const taxAmount = Math.round((subtotal - discountAmount) * 0.18); // 18% GST
+  const finalTotal = subtotal - discountAmount + shippingCost;
 
-      alert("Item Removed ❌");
-
-      fetchCart();
-    } catch (error) {
-      console.log(error);
-    }
+  const handleCheckout = () => {
+    // Save financial details in session storage for checkout page
+    sessionStorage.setItem("checkout_financials", JSON.stringify({
+      subtotal,
+      discountAmount,
+      shippingCost,
+      taxAmount,
+      finalTotal,
+      discount,
+    }));
+    navigate("/checkout");
   };
 
-  // Loading State
-  if (!cart) {
+  if (loading && !cart) {
     return (
-      <div
-        style={{
-          minHeight: "85vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          fontSize: "24px",
-        }}
-      >
-        🛒 Loading Cart...
+      <div style={{ minHeight: "75vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <div className="skeleton" style={{ width: "80px", height: "80px", borderRadius: "50%" }} />
       </div>
     );
   }
 
-  // Total Amount
-  const totalAmount =
-    cart.items?.reduce(
-      (total, item) =>
-        total +
-        ((item.product?.price || 0) * item.quantity),
-      0
-    ) || 0;
-
-  // Place Order
-  const handlePlaceOrder = async (
-  paymentMethod = "Cash On Delivery"
-) => {
-  try {
-    const orderData = {
-      user: cart.user._id,
-
-      products: cart.items
-        .filter((item) => item.product)
-        .map((item) => ({
-          product: item.product._id,
-          quantity: item.quantity,
-        })),
-
-      totalAmount,
-      paymentMethod,
-    };
-
-    await createOrder(orderData);
-
-    alert(
-      `📦 Order Placed Successfully!\nPayment Method: ${paymentMethod}`
-    );
-
-    fetchCart();
-  } catch (error) {
-    console.log(error);
-    alert("Order Failed");
-  }
-};
-
-  const handleCheckout = () => {
-  const paymentMethod = window.prompt(
-    `Total Amount: ₹${totalAmount}
-
-Choose Payment Method:
-
-1 - Online Payment
-2 - Cash On Delivery (COD)
-
-Enter 1 or 2`
-  );
-
-  if (paymentMethod === "1") {
-    alert(
-      `✅ Online Payment Successful!\nAmount Paid: ₹${totalAmount}`
-    );
-
-    handlePlaceOrder("Online Payment");
-  } else if (paymentMethod === "2") {
-    alert(
-      `📦 Cash On Delivery Selected.\nPlease pay ₹${totalAmount} upon delivery.`
-    );
-
-    handlePlaceOrder("Cash On Delivery");
-  } else {
-    alert("❌ Invalid Payment Option");
-  }
-};
+  const cartItems = cart?.items?.filter((item) => item.product) || [];
 
   return (
-    <div
-      style={{
-        minHeight: "85vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background:
-          "linear-gradient(135deg,#f8fafc,#e2e8f0)",
-      }}
-    >
-      <div
-        style={{
-          width: "650px",
-          background: "white",
-          padding: "30px",
-          borderRadius: "20px",
-          boxShadow: "0 15px 35px rgba(0,0,0,0.1)",
-        }}
-      >
-        <h1
-          style={{
-            textAlign: "center",
-            marginBottom: "25px",
-          }}
-        >
-          🛒 My Cart
-        </h1>
+    <div className="section-padding anim-fade-in" style={{ minHeight: "85vh" }}>
+      <div className="container">
+        <h1 style={{ textAlign: "left", marginBottom: "32px", fontSize: "2.25rem" }}>Shopping Cart</h1>
 
-        {cart.items?.filter((item) => item.product)
-          .length === 0 ? (
-          <h2
+        {cartItems.length === 0 ? (
+          <div
+            className="glass-card"
             style={{
+              padding: "60px 40px",
               textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "20px",
             }}
           >
-            Cart is Empty 🛒
-          </h2>
+            <span style={{ fontSize: "4rem" }}>🛒</span>
+            <h2>Your Cart is Empty</h2>
+            <p style={{ color: "var(--text-muted)", maxWidth: "400px" }}>
+              Looks like you haven't added anything to your cart yet. Head back to the shop and explore our products.
+            </p>
+            <Link to="/products" className="btn btn-primary">
+              Continue Shopping
+            </Link>
+          </div>
         ) : (
-          <>
-            {cart.items
-              .filter((item) => item.product)
-              .map((item) => (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1.8fr 1fr",
+              gap: "40px",
+              alignItems: "start",
+            }}
+            className="cart-layout"
+          >
+            {/* Cart Items List */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+              
+              {/* Free Shipping Progress Indicator */}
+              <div
+                className="glass-card"
+                style={{
+                  padding: "16px 24px",
+                  textAlign: "left",
+                  background: "rgba(255, 255, 255, 0.95)",
+                }}
+              >
+                {subtotal >= 2000 ? (
+                  <span style={{ fontWeight: "600", color: "var(--success)" }}>
+                    🎉 You qualify for <strong>Free Shipping</strong>!
+                  </span>
+                ) : (
+                  <div>
+                    <p style={{ fontWeight: "500", fontSize: "0.95rem", marginBottom: "8px" }}>
+                      Add <strong>₹{(2000 - subtotal).toLocaleString("en-IN")}</strong> more to get <strong>Free Shipping</strong>!
+                    </p>
+                    <div style={{ width: "100%", height: "6px", backgroundColor: "#e2e8f0", borderRadius: "3px", overflow: "hidden" }}>
+                      <div
+                        style={{
+                          width: `${Math.min((subtotal / 2000) * 100, 100)}%`,
+                          height: "100%",
+                          backgroundColor: "var(--primary)",
+                          transition: "var(--transition)",
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Items Card */}
+              <div className="glass-card" style={{ padding: "24px", display: "flex", flexDirection: "column", gap: "24px" }}>
+                {cartItems.map((item) => (
+                  <div
+                    key={item._id}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "20px",
+                      borderBottom: "1px solid var(--border-color)",
+                      paddingBottom: "24px",
+                    }}
+                    className="cart-item"
+                  >
+                    {/* Product Image */}
+                    <img
+                      src={item.product.image || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=120"}
+                      alt={item.product.name}
+                      style={{
+                        width: "90px",
+                        height: "90px",
+                        objectFit: "cover",
+                        borderRadius: "var(--radius-md)",
+                        backgroundColor: "#f1f5f9",
+                      }}
+                    />
+
+                    {/* Product Details */}
+                    <div style={{ flexGrow: 1, textAlign: "left" }}>
+                      <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "600", textTransform: "uppercase" }}>
+                        {item.product.brand}
+                      </span>
+                      <Link to={`/product/${item.product._id}`} style={{ display: "block", margin: "2px 0 6px 0" }}>
+                        <h3 style={{ fontSize: "1.05rem", fontWeight: "700" }}>{item.product.name}</h3>
+                      </Link>
+                      <span style={{ fontSize: "1.25rem", fontWeight: "800", color: "var(--primary)" }}>
+                        ₹{item.product.price.toLocaleString("en-IN")}
+                      </span>
+                    </div>
+
+                    {/* Quantity & Delete Controls */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "24px",
+                      }}
+                      className="cart-actions-wrapper"
+                    >
+                      {/* Quantity Selector */}
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          border: "1px solid var(--border-color)",
+                          borderRadius: "var(--radius-sm)",
+                          background: "#f8fafc",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <button
+                          disabled={item.quantity <= 1}
+                          onClick={() => updateProductQty(item.product._id, item.quantity - 1)}
+                          style={qtyButtonStyle}
+                        >
+                          −
+                        </button>
+                        <span style={{ width: "32px", textAlign: "center", fontWeight: "600", fontSize: "0.9rem" }}>
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() => updateProductQty(item.product._id, item.quantity + 1)}
+                          style={qtyButtonStyle}
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      {/* Delete / Move to Wishlist */}
+                      <div style={{ display: "flex", gap: "12px" }}>
+                        <button
+                          onClick={() => {
+                            toggleWishlist(item.product._id);
+                            removeProductFromCart(item.product._id);
+                          }}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            fontSize: "1.1rem",
+                            color: "var(--text-muted)",
+                          }}
+                          title="Save for Later"
+                        >
+                          ❤️
+                        </button>
+                        <button
+                          onClick={() => removeProductFromCart(item.product._id)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            fontSize: "1.1rem",
+                            color: "var(--danger)",
+                          }}
+                          title="Remove Item"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Order Summary Sidebar */}
+            <div
+              className="glass-card"
+              style={{
+                padding: "30px",
+                position: "sticky",
+                top: "100px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px",
+                textAlign: "left",
+              }}
+            >
+              <h3 style={{ fontSize: "1.35rem", marginBottom: "8px" }}>Order Summary</h3>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", fontSize: "0.95rem" }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span>Subtotal</span>
+                  <span>₹{subtotal.toLocaleString("en-IN")}</span>
+                </div>
+                
+                {discount > 0 && (
+                  <div style={{ display: "flex", justifyContent: "space-between", color: "var(--success)", fontWeight: "600" }}>
+                    <span>Discount ({discount}%)</span>
+                    <span>- ₹{discountAmount.toLocaleString("en-IN")}</span>
+                  </div>
+                )}
+
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span>Shipping Cost</span>
+                  <span>{shippingCost === 0 ? "FREE" : `₹${shippingCost}`}</span>
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "space-between", color: "var(--text-muted)" }}>
+                  <span>Estimated GST (18%)</span>
+                  <span>Included</span>
+                </div>
+
+                <hr style={{ border: "none", borderTop: "1px solid var(--border-color)", margin: "8px 0" }} />
+
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "1.3rem", fontWeight: "800", color: "var(--text-dark)" }}>
+                  <span>Total</span>
+                  <span>₹{finalTotal.toLocaleString("en-IN")}</span>
+                </div>
+              </div>
+
+              {/* Coupon Form */}
+              <form onSubmit={handleApplyCoupon} style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
+                <input
+                  type="text"
+                  placeholder="Coupon Code"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                  style={{
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    border: "1px solid var(--border-color)",
+                    fontSize: "0.85rem",
+                    flexGrow: 1,
+                    outline: "none",
+                  }}
+                />
+                <button type="submit" className="btn btn-secondary btn-sm" style={{ padding: "10px 16px" }}>
+                  Apply
+                </button>
+              </form>
+              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Try coupon code: <strong>TECH10</strong></span>
+
+              <button onClick={handleCheckout} className="btn btn-primary btn-block" style={{ marginTop: "12px", padding: "14px" }}>
+                Proceed to Checkout 🚀
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Save for Later / Wishlist Section */}
+        {wishlist.length > 0 && (
+          <section style={{ marginTop: "80px", textAlign: "left" }}>
+            <h2 style={{ marginBottom: "24px" }}>Saved For Later</h2>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+                gap: "24px",
+              }}
+            >
+              {wishlist.map((item) => (
                 <div
                   key={item._id}
+                  className="glass-card"
                   style={{
-                    border: "1px solid #ddd",
-                    borderRadius: "12px",
-                    padding: "20px",
-                    marginBottom: "15px",
+                    padding: "16px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
                   }}
                 >
-                  <h2>{item.product.name}</h2>
-
-                  <p>
-                    Quantity: {item.quantity}
-                  </p>
-
-                  <h3
-                    style={{
-                      color: "#2563eb",
-                    }}
-                  >
-                    ₹{item.product.price}
-                  </h3>
-
+                  <img
+                    src={item.image || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=120"}
+                    alt={item.name}
+                    style={{ width: "100%", height: "160px", objectFit: "cover", borderRadius: "var(--radius-md)" }}
+                  />
+                  <div>
+                    <h4 style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.name}</h4>
+                    <span style={{ fontWeight: "700", color: "var(--primary)" }}>₹{item.price}</span>
+                  </div>
                   <button
-                    onClick={() =>
-                      handleRemove(cart._id)
-                    }
-                    style={{
-                      background: "#ef4444",
-                      color: "white",
-                      border: "none",
-                      padding: "10px 15px",
-                      borderRadius: "8px",
-                      cursor: "pointer",
+                    onClick={async () => {
+                      // Move to Cart
+                      const added = await updateProductQty(item._id, 1).catch(() => false);
+                      if (!added) {
+                        // If not in cart, add it
+                        await removeProductFromCart(item._id).catch(() => {}); // clear any residue
+                        await updateProductQty(item._id, 1);
+                      }
+                      toggleWishlist(item._id); // remove from wishlist
                     }}
+                    className="btn btn-secondary btn-sm btn-block"
                   >
-                    Remove ❌
+                    🛒 Move to Cart
                   </button>
                 </div>
               ))}
-
-            <div
-              style={{
-                borderTop: "1px solid #ddd",
-                paddingTop: "20px",
-                marginTop: "20px",
-              }}
-            >
-              <h2>Total: ₹{totalAmount}</h2>
-
-              <button
-                onClick={handleCheckout}
-                style={{
-                  width: "100%",
-                  padding: "14px",
-                  background: "#2563eb",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "10px",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                  marginBottom: "10px",
-                }}
-              >
-                Proceed To Checkout 🚀
-              </button>
-
-              <button
-                onClick={handlePlaceOrder}
-                style={{
-                  width: "100%",
-                  padding: "14px",
-                  background: "#16a34a",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "10px",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                }}
-              >
-                📦 Place Order
-              </button>
             </div>
-          </>
+          </section>
         )}
+
       </div>
+
+      <style>{`
+        @media (max-width: 992px) {
+          .cart-layout {
+            grid-template-columns: 1fr !important;
+          }
+        }
+        @media (max-width: 576px) {
+          .cart-item {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 16px !important;
+          }
+          .cart-actions-wrapper {
+            width: 100% !important;
+            justify-content: space-between !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
+
+const qtyButtonStyle = {
+  width: "32px",
+  height: "32px",
+  background: "none",
+  border: "none",
+  fontSize: "1.1rem",
+  cursor: "pointer",
+  transition: "var(--transition-fast)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
 
 export default Cart;

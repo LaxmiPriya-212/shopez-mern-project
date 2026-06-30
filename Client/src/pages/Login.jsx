@@ -1,116 +1,111 @@
-import { useState } from "react";
-import { loginUser } from "../api/authApi";
+import React, { useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const submitHandler = async (e) => {
+  const { login } = useAuth();
+  const { showToast } = useToast();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Redirect parameter (e.g. if redirected from cart, go back to checkout)
+  const redirect = searchParams.get("redirect") || "/";
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!email || !password) {
+      showToast("Please fill in all fields", "warning");
+      return;
+    }
 
     try {
-      const { data } = await loginUser({
-        email,
-        password,
-      });
-
-      localStorage.setItem("token", data.token);
-
-      alert("Login Successful 🚀");
+      setLoading(true);
+      const success = await login(email, password);
+      if (success) {
+        navigate(redirect);
+      }
     } catch (error) {
-      alert(error.response?.data?.message || "Login Failed");
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div
+      className="section-padding anim-fade-in"
       style={{
         minHeight: "85vh",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        background:
-          "linear-gradient(135deg, #f8fafc, #e2e8f0)",
+        background: "radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 40%)",
       }}
     >
       <div
+        className="glass-card"
         style={{
-          width: "400px",
-          background: "white",
-          padding: "35px",
-          borderRadius: "20px",
-          boxShadow: "0 15px 35px rgba(0,0,0,0.1)",
+          width: "100%",
+          maxWidth: "440px",
+          padding: "40px",
+          textAlign: "center",
         }}
       >
-        <h1
-          style={{
-            textAlign: "center",
-            marginBottom: "25px",
-            color: "#1e293b",
-          }}
-        >
-          Welcome Back 👋
-        </h1>
+        <h1 style={{ fontSize: "2rem", marginBottom: "8px", color: "var(--text-dark)" }}>Welcome Back</h1>
+        <p style={{ color: "var(--text-muted)", marginBottom: "32px" }}>Sign in to continue shopping on ShopEZ</p>
 
-        <form onSubmit={submitHandler}>
-          <input
-            type="email"
-            placeholder="Enter Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "14px",
-              marginBottom: "15px",
-              borderRadius: "10px",
-              border: "1px solid #cbd5e1",
-              fontSize: "15px",
-              boxSizing: "border-box",
-            }}
-          />
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          <div className="form-group">
+            <label className="form-label" htmlFor="email">Email Address</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="name@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="form-input"
+              required
+            />
+          </div>
 
-          <input
-            type="password"
-            placeholder="Enter Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "14px",
-              marginBottom: "20px",
-              borderRadius: "10px",
-              border: "1px solid #cbd5e1",
-              fontSize: "15px",
-              boxSizing: "border-box",
-            }}
-          />
+          <div className="form-group">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+              <label className="form-label" htmlFor="password" style={{ margin: 0 }}>Password</label>
+              <span style={{ fontSize: "0.8rem", color: "var(--primary)", fontWeight: "600", cursor: "pointer" }}>
+                Forgot Password?
+              </span>
+            </div>
+            <input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="form-input"
+              required
+            />
+          </div>
 
           <button
             type="submit"
-            style={{
-              width: "100%",
-              padding: "14px",
-              background: "#2563eb",
-              color: "white",
-              border: "none",
-              borderRadius: "10px",
-              fontSize: "16px",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
+            className="btn btn-primary btn-block"
+            style={{ padding: "14px", marginTop: "10px" }}
+            disabled={loading}
           >
-            Login 🚀
+            {loading ? "Signing In..." : "Sign In 🚀"}
           </button>
         </form>
 
-        <p
-          style={{
-            textAlign: "center",
-            marginTop: "20px",
-            color: "#64748b",
-          }}
-        >
-          New to ShopEZ? Register now
+        <p style={{ marginTop: "24px", fontSize: "0.9rem", color: "var(--text-muted)" }}>
+          New to ShopEZ?{" "}
+          <Link to={`/register?redirect=${encodeURIComponent(redirect)}`} style={{ color: "var(--primary)", fontWeight: "700" }}>
+            Create an Account
+          </Link>
         </p>
       </div>
     </div>

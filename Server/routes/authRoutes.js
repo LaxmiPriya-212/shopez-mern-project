@@ -2,21 +2,25 @@ const express = require("express");
 const {
   registerUser,
   loginUser,
+  getUserProfile,
+  updateUserProfile,
+  updateUserPassword,
+  getWishlist,
+  toggleWishlist,
 } = require("../controllers/authController");
 
-const protect = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 
-router.get("/profile", protect, (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Protected Route Accessed",
-    user: req.user,
-  });
-});
+router.get("/profile", protect, getUserProfile);
+router.put("/profile", protect, updateUserProfile);
+router.put("/password", protect, updateUserPassword);
+
+router.get("/wishlist", protect, getWishlist);
+router.post("/wishlist", protect, toggleWishlist);
 
 module.exports = router;
